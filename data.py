@@ -1,61 +1,93 @@
 import requests
+import tweepy
 import os
 from dotenv import load_dotenv
-import json
+from bs4 import BeautifulSoup
+import re
 
-# Load environment variables first
 load_dotenv()
 
-# Player ID for the query
-player_id = 874
+#Fetching data from web
+"------------------------------------------------------------------------"
 
-# API endpoint for player statistics
-url = "https://v3.football.api-sports.io/players"
+# File to store the previous goal count
+GOAL_COUNT_FILE = "previous_goals.txt"
 
-# Parameters for the 2023 season (free plan limitation)
-payload = {
-    'id': player_id,
-    'season': '2023'
-}
+url = "https://www.roadto1000goals.com/"
 
-headers = {
-  'x-rapidapi-key': os.getenv('DATA_KEY'),
-  'x-rapidapi-host': 'v3.football.api-sports.io'
-}
+# Variables to store current total goals and increment
+current_total_goals = 0
+goal_increment = 0
 
-response = requests.request("GET", url, headers=headers, params=payload)
-
-# Parse the response
-data = response.json()
-
-# Pretty print the JSON response
-print(json.dumps(data, indent=2))
-
-# Extract and display goal statistics if available
-if data['results'] > 0:
-    player_data = data['response'][0]
-    player = player_data['player']
-    statistics = player_data['statistics']
+try:
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
     
-    print(f"\n=== GOAL STATISTICS for {player['name']} (ID: {player['id']}) ===")
-    print(f"Age: {player['age']}")
-    print(f"Nationality: {player['nationality']}")
-    print(f"Position: {player['position']}")
+    # Get the total goal count
+    goal_counter = soup.find('h1', class_='goal-counter')
+    if goal_counter:
+        current_total_goals = int(goal_counter.get_text(strip=True))
+        print(f"Current total goals: {current_total_goals}")
     
-    for stat in statistics:
-        team = stat['team']
-        league = stat['league']
-        goals = stat['goals']
-        games = stat['games']
-        
-        print(f"\n--- {team['name']} ({league['name']}) ---")
-        print(f"Games Played: {games['appearences']}")
-        print(f"Goals Scored: {goals['total']}")
-        print(f"Goals (Home): {goals['home']}")
-        print(f"Goals (Away): {goals['away']}")
-        print(f"Minutes Played: {games['minutes']}")
-        
-        if goals['total']:
-            print(f"Goals per Game: {goals['total'] / games['appearences']:.2f}")
-else:
-    print("No data found for player ID 874")
+    # Read previous goal count
+    previous_goals = 0
+    if os.path.exists(GOAL_COUNT_FILE):
+        with open(GOAL_COUNT_FILE, 'r') as f:
+            previous_goals = int(f.read().strip())
+    
+    
+    goal_increment = current_total_goals - previous_goals
+    
+
+    print(f"Goal increment: {goal_increment}")
+    if goal_increment > 0:
+        inreased_goal=goal_increment
+    
+    # Save current total for next time
+    with open(GOAL_COUNT_FILE, 'w') as f:
+        f.write(str(current_total_goals))
+
+except Exception as e:
+    print(f" Error parsing data: {e}")
+
+
+"""                                 Twitter setup                                    """
+"-----------------------------------------------------------------------------------------"
+api_key = os.getenv('API_KEY')
+api_secret = os.getenv('API_SECRET')
+bearer_token = os.getenv('BEARER_TOKEN')
+access_token = os.getenv('ACCESS_TOKEN')
+access_token_secret = os.getenv('ACCESS_TOKEN_SECRET')
+
+
+
+client = tweepy.Client(
+    bearer_token=bearer_token,
+    consumer_key=api_key,
+    consumer_secret=api_secret,
+    access_token=access_token,
+    access_token_secret=access_token_secret
+)
+
+here=f"{goal_increment}"
+client.create_tweet(text=here)
+
+# auth =tweepy.OAuth1UserHandler(api_key, api_secret,access_token, access_token_secret)
+# api=tweepy.API(auth)
+
+# try:
+#     # Test 1: Get your own user info
+#     me = client.get_me()
+#     print(f"✅ Twitter API working! Logged in as: {me.data.username}")
+    
+#     # Test 2: Check API limits
+#     verify = api.verify_credentials()
+#     if verify:
+#         print(f"✅ API credentials verified! Account: @{verify.screen_name}")
+    
+# except Exception as e:
+#     print(f"❌ Twitter API error: {e}")
+
+# tweet_content = f"{current_total_goals}"
+
+# response=client.create_tweet(text=tweet_content.strip())
