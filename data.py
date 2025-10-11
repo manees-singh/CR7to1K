@@ -43,7 +43,7 @@ try:
     if goal_increment > 0:
         inreased_goal=goal_increment
     
-    # Save current total for next time
+
     with open(GOAL_COUNT_FILE, 'w') as f:
         f.write(str(current_total_goals))
 
@@ -69,8 +69,26 @@ client = tweepy.Client(
     access_token_secret=access_token_secret
 )
 
-here=f"{goal_increment}"
+filled_char = '\u2588'  # This is the full block '█'
+unfilled_char = '\u2591' 
+ball='\u26BD'
+thousand=1000
+bar_length=30
+
+filled_length=int((previous_goals/thousand)*bar_length)
+her=f"[]"
+
+
+if goal_increment>0:
+    here=f"{goal_increment}"
+    client.create_tweet(text=here)
+
+
+
+
+here=f"{bar}"
 client.create_tweet(text=here)
+
 
 # auth =tweepy.OAuth1UserHandler(api_key, api_secret,access_token, access_token_secret)
 # api=tweepy.API(auth)
