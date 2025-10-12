@@ -3,7 +3,6 @@ import tweepy
 import os
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
-import re
 import random
 
 load_dotenv()

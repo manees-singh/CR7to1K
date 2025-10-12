@@ -1,0 +1,47 @@
+name: Run Twitter Bot
+
+on:
+  schedule:
+  
+    - cron: '*/45 * * * *' # Runs every 45 minutes
+
+
+    
+  
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+
+      - name: Run the Twitter bot script
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          API_SECRET: ${{ secrets.API_SECRET }}
+          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+        run: python data.py
+
+
+      - name: Commit and push if goal count changed
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions-bot@github.com"
+          git add previous_goals.txt
+
+          git diff-index --quiet HEAD || git commit -m "Update previous goal count" && git push
