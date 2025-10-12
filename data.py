@@ -4,13 +4,14 @@ import os
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 import re
+import random
 
 load_dotenv()
 
 #Fetching data from web
 "------------------------------------------------------------------------"
 
-# File to store the previous goal count
+# previous goal count
 GOAL_COUNT_FILE = "previous_goals.txt"
 
 url = "https://www.roadto1000goals.com/"
@@ -23,25 +24,21 @@ try:
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    # Get the total goal count
+    # total goal count
     goal_counter = soup.find('h1', class_='goal-counter')
     if goal_counter:
         current_total_goals = int(goal_counter.get_text(strip=True))
-        print(f"Current total goals: {current_total_goals}")
+        
     
-    # Read previous goal count
+    # previous goal count
     previous_goals = 0
     if os.path.exists(GOAL_COUNT_FILE):
         with open(GOAL_COUNT_FILE, 'r') as f:
             previous_goals = int(f.read().strip())
     
     
-    goal_increment = current_total_goals - previous_goals
+    goals = current_total_goals - previous_goals
     
-
-    print(f"Goal increment: {goal_increment}")
-    if goal_increment > 0:
-        inreased_goal=goal_increment
     
 
     with open(GOAL_COUNT_FILE, 'w') as f:
@@ -69,43 +66,38 @@ client = tweepy.Client(
     access_token_secret=access_token_secret
 )
 
-filled_char = '\u2588'  # This is the full block '█'
-unfilled_char = '\u2591' 
+filled_char = '\u2588'  # full block '█'
+unfilled_char = '░'
 ball='\u26BD'
 thousand=1000
 bar_length=30
+tags=["#Ronaldo #CR7 #Siuuu", "#Ronaldo #GOAT", "#CR7 #Ronaldo", "#Ronaldo #CR7",
+      "#CR7 #VivaRonaldo" , "#Ronaldo #GOAT #CR7"]
+chant=["SIIIIIIIIIIUUUUUUUUUU! 🐐", "Another goal for Cristiano Ronaldo! 👑",
+       "THE GOAL MACHINE HAS BEEN ACTIVATED. 🤖","He scores when he wants!", 
+       "GOAL RONALDO! 🔥","👑 Cristiano Ronaldo puts it in the back of the net",
+         "GOAL RONALDO! 💥", "EL BICHO GETS ANOTHER ONE "+ ball  ]
+
 
 filled_length=int((previous_goals/thousand)*bar_length)
-her=f"[]"
-
-
-if goal_increment>0:
-    here=f"{goal_increment}"
-    client.create_tweet(text=here)
+solid_blocks_length = filled_length - goals
+unfilled_length = bar_length - filled_length
+bar = (filled_char * solid_blocks_length) + (ball * goals) + (unfilled_char * unfilled_length)
 
 
 
 
-here=f"{bar}"
-client.create_tweet(text=here)
+# tweet_content=f"\r{bar}  {current_total_goals}/1000\n"
+
+tweet_content= random.choice(chant) + "\n"
+tweet_content += random.choice(tags) 
+tweet_content += f"\r{bar}  {current_total_goals}/1000\n"
+
+if goals>0:
+
+    client.create_tweet(text=tweet_content)
 
 
-# auth =tweepy.OAuth1UserHandler(api_key, api_secret,access_token, access_token_secret)
-# api=tweepy.API(auth)
 
-# try:
-#     # Test 1: Get your own user info
-#     me = client.get_me()
-#     print(f"✅ Twitter API working! Logged in as: {me.data.username}")
-    
-#     # Test 2: Check API limits
-#     verify = api.verify_credentials()
-#     if verify:
-#         print(f"✅ API credentials verified! Account: @{verify.screen_name}")
-    
-# except Exception as e:
-#     print(f"❌ Twitter API error: {e}")
 
-# tweet_content = f"{current_total_goals}"
 
-# response=client.create_tweet(text=tweet_content.strip())
