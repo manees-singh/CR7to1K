@@ -13,20 +13,23 @@ load_dotenv()
 # previous goal count
 GOAL_COUNT_FILE = "previous_goals.txt"
 
-url = "https://www.roadto1000goals.com/"
+url = "https://www.messivsronaldo.app/"
 
 # Variables to store current total goals and increment
 current_total_goals = 0
-goal_increment = 0
+goals = 0
 
 try:
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     
     # total goal count
-    goal_counter = soup.find('h1', class_='goal-counter')
+    ronaldo=soup.find('div', class_='StatsBlock-module--statsBlock--4b2a6 StatsBlock-module--RonaldoStatsBlock--f266e relative text-center w-1/2')
+    goal_counter = ronaldo.find('li', class_='StatsBlock-module--goals--df119')
+
     if goal_counter:
-        current_total_goals = int(goal_counter.get_text(strip=True))
+        current_goal=goal_counter.find('span', class_ ='StatsBlock-module--statNum--f90f1')
+        current_total_goals = int(current_goal.get_text(strip=True))
         
     
     # previous goal count
@@ -35,7 +38,7 @@ try:
         with open(GOAL_COUNT_FILE, 'r') as f:
             previous_goals = int(f.read().strip())
     
-    
+    print(current_total_goals)
     goals = current_total_goals - previous_goals
     
     
@@ -45,7 +48,6 @@ try:
 
 except Exception as e:
     print(f" Error parsing data: {e}")
-
 
 """                                 Twitter setup                                    """
 "-----------------------------------------------------------------------------------------"
