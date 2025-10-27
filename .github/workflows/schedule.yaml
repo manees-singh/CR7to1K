@@ -50,7 +50,8 @@ jobs:
             git config --global user.email "actions-bot@github.com"
 
 
-            git commit -m "Update previous goal count" && git push
+            git commit -m "Update previous goal count" 
+            git push
 
 
           else
