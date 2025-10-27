@@ -42,18 +42,8 @@ jobs:
 
       - name: Commit and push if goal count changed
         run: |
-          
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions-bot@github.com"
           git add previous_goals.txt
 
-          if git diff-index --quiet HEAD; then
-            git config --global user.name "GitHub Actions Bot"
-            git config --global user.email "actions-bot@github.com"
-
-
-            git commit -m "Update previous goal count" 
-            git push
-
-
-          else
-            echo "no changes to commit"
-          fi
+          git diff-index --quiet HEAD || git commit -m "Update previous goal count" && git push
