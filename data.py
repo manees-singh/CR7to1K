@@ -71,7 +71,7 @@ filled_char = '\u2588'  # full block '█'
 unfilled_char = '░'
 ball='\u26BD'
 thousand=1000
-bar_length=30
+bar_length=22
 tags=["#Ronaldo #CR7 #Siuuu", "#Ronaldo #GOAT", "#CR7 #Ronaldo", "#Ronaldo #CR7",
       "#CR7 #VivaRonaldo" , "#Ronaldo #GOAT #CR7"]
 chant=["SIIIIIIIIIIUUUUUUUUUU! 🐐", "Another goal for Cristiano Ronaldo! 👑",
