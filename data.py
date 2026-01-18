@@ -90,8 +90,9 @@ bar = (filled_char * solid_blocks_length) + (ball * goals) + (unfilled_char * un
 
 # tweet_content=f"\r{bar}  {current_total_goals}/1000\n"
 
-tweet_content= random.choice(chant) + "\n"
+
 tweet_content=f"{1000-current_total_goals} more to go\n"
+tweet_content+= random.choice(chant) + "\n"
 tweet_content += random.choice(tags) 
 tweet_content += f"\r{bar}  {current_total_goals}/1000\n"
 
